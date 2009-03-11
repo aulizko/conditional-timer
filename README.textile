@@ -1,0 +1,6 @@
+h1. Conditional timer
+
+h2. Description
+
+Timer which should check user-defined counter every iteration.
+For api and usage, check wait.js and "example":http://jsbin.com/ogoku/edit .
