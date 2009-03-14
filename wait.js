@@ -6,22 +6,15 @@
  * Timer which will repeat till counter is expired or condition (any function you passed in) return true;
  * You can redefine its name at the line 22.
  * Usage:
- *      timer.setCondition(function () {
- *          // check if variable are ready        
- *          if (typeof window.coockoo !== 'undefined') {
- *              return true;
- *          } else {
- *              return false;
- *          }
- *      });
- *
- *      timer.setFrequency(25);
- *      timer.setCounter(10); // Счетчик
- *       timer.start();
  */
 (function () {
     window.timer = function () {
-        var timer = null, counter = 200, frequency = 10, condition = function () { return false; };
+        var timer = null, 
+            counter = 200, 
+            frequency = 10, 
+            condition = function () { return false; },
+            onSuccessCallback = function () {}, 
+            onErrorCallback = function () {};
 
         return {
             /**
@@ -77,6 +70,34 @@
             stop : function () {
                 clearInterval(timer);
                 timer = null;
+            },
+
+            /**
+             * Set callback which should being executed on success (if condition return true)
+             * @method onSucess
+             * @param fn {Function} function which should being executed
+             * @param data {Mixed} data which should be passed into callback funciton
+             * @param context {Object} context of the function
+             */
+            onSuccess : function (fn, data, context) {
+                context = (context) ? context : window;
+                onSuccessCallback = function () {
+                    fn.call(context, data);
+                };
+            },
+
+            /**
+             * Set callback which should being executed on error (if counter rich end and condition stll return false)
+             * @method onError
+             * @param fn {Funciton} function which shuld being executed
+             * @param data {Mixed} data which should being passed into callback function
+             * @param context {Object} context of the function
+             */
+            onError : function (fn, data, context) {
+                context = (context) ? context : window;
+                onErrorCallback = function () {
+                    fn.call(context, data);
+                };
             }
         };    
     }();
