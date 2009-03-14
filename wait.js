@@ -14,7 +14,8 @@
             frequency = 10, 
             condition = function () { return false; },
             onSuccessCallback = function () {}, 
-            onErrorCallback = function () {};
+            onErrorCallback = function () {},
+            onStepCallback = function () {};
 
         return {
             /**
@@ -59,21 +60,14 @@
              * @private
              */
             checkCounterLimit : function () {
-                console.log('counter: %o', counter);
-                
-                console.log('timer');
                 if (condition()) { // success
                     this.stop();
                     onSuccessCallback();
-                    console.log('success');
                 } else {
                     if (counter == 0) { // error
                         this.stop();
-                        console.log('error');
-                        
                         onErrorCallback();
                     } else {
-                        console.log('step');
                         counter --; // go on
                     }
                 }
@@ -83,7 +77,6 @@
              * @method stop
              */
             stop : function () {
-                console.log('stop method called');
                 clearInterval(timer);
                 timer = null;
             },
@@ -112,6 +105,19 @@
             onError : function (fn, data, context) {
                 context = (context) ? context : window;
                 onErrorCallback = function () {
+                    fn.call(context, data);
+                };
+            },
+            /**
+             * Set callback which should being executed every iteration
+             * @method onStep
+             * @param fn {Funciton} function which shuld being executed
+             * @param data {Mixed} data which should being passed into callback function
+             * @param context {Object} context of the function
+             */
+            onStep : function (fn, data, context) {
+                context = (context) ? context : window;
+                onStepCallback = function () {
                     fn.call(context, data);
                 };
             }
