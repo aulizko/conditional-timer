@@ -68,6 +68,7 @@
                         this.stop();
                         onErrorCallback();
                     } else {
+                        onStepCallback();
                         counter --; // go on
                     }
                 }

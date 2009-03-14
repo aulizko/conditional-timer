@@ -13,9 +13,6 @@
                 if (typeof window.coockoo !== 'undefined') {
                     return true;
                 } else {
-                    var p = document.createElement('p');
-                    p.appendChild(document.createTextNode('timer are invocated'));
-                    document.body.appendChild(p);
                     return false;
                 }
             });
@@ -29,6 +26,12 @@
             timer.onError(function () {
                 var p = document.createElement('p');
                 p.appendChild(document.createTextNode('error!'));
+                document.body.appendChild(p);
+            });
+
+            timer.onStep(function () {
+                var p = document.createElement('p');
+                p.appendChild(document.createTextNode('timer are invocated'));
                 document.body.appendChild(p);
             });
 
