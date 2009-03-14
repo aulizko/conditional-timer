@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>Conditional timer demo</title>
+    </head>
+    <body>
+        <script type="text/javascript" src="../wait.js"></script>
+        <script type="text/javascript" charset="utf-8">
+            timer.setCondition(function () {
+                // check if variable are ready        
+                if (typeof window.coockoo !== 'undefined') {
+                    return true;
+                } else {
+                    var p = document.createElement('p');
+                    p.appendChild(document.createTextNode('timer are invocated'));
+                    document.body.appendChild(p);
+                    return false;
+                }
+            });
+            
+            timer.onSuccess(function () {
+                var p = document.createElement('p');
+                p.appendChild(document.createTextNode('success!'));
+                document.body.appendChild(p);
+            });
+            
+            timer.onError(function () {
+                var p = document.createElement('p');
+                p.appendChild(document.createTextNode('error!'));
+                document.body.appendChild(p);
+            });
+
+            timer.setFrequency(25);
+            timer.setCounter(10);
+
+            setTimeout(function () {
+                window.coockoo = 'abracadabra';
+            }, 140);
+
+            timer.start();
+            
+            setTimeout(function () {
+                delete coockoo;
+                
+                timer.setCounter(10);
+                
+                setTimeout(function () {
+                    window.coockoo = 'abracadabra'
+                }, 600);
+                
+                timer.start();
+            }, 500);
+            
+        </script>
+    </body>
+</html>

@@ -47,6 +47,7 @@
              * @method start
              */
             start : function () {
+                this.stop();
                 var self = this;
                 timer = setInterval(function () {
                     self.checkCounterLimit();
@@ -58,9 +59,23 @@
              * @private
              */
             checkCounterLimit : function () {
-                if (condition() || (counter == 0)) { this.stop(); }
-                else {
-                    counter--;
+                console.log('counter: %o', counter);
+                
+                console.log('timer');
+                if (condition()) { // success
+                    this.stop();
+                    onSuccessCallback();
+                    console.log('success');
+                } else {
+                    if (counter == 0) { // error
+                        this.stop();
+                        console.log('error');
+                        
+                        onErrorCallback();
+                    } else {
+                        console.log('step');
+                        counter --; // go on
+                    }
                 }
             },
             /**
@@ -68,6 +83,7 @@
              * @method stop
              */
             stop : function () {
+                console.log('stop method called');
                 clearInterval(timer);
                 timer = null;
             },
