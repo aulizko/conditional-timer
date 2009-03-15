@@ -8,52 +8,68 @@
     <body>
         <script type="text/javascript" src="../wait.js"></script>
         <script type="text/javascript" charset="utf-8">
-            timer.setCondition(function () {
-                // check if variable are ready        
-                if (typeof window.coockoo !== 'undefined') {
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-            
-            timer.onSuccess(function () {
+            function report (msg) { // todo: remove from global namespace
                 var p = document.createElement('p');
-                p.appendChild(document.createTextNode('success!'));
+                p.appendChild(document.createTextNode(msg));
                 document.body.appendChild(p);
-            });
-            
-            timer.onError(function () {
-                var p = document.createElement('p');
-                p.appendChild(document.createTextNode('error!'));
-                document.body.appendChild(p);
-            });
+                p = null; //prevent memory leaks
+            };
 
-            timer.onStep(function () {
-                var p = document.createElement('p');
-                p.appendChild(document.createTextNode('timer are invocated'));
-                document.body.appendChild(p);
-            });
-
-            timer.setFrequency(25);
-            timer.setCounter(10);
+            Timer({
+                condition : function () {
+                    // check if variable are ready        
+                    if (typeof window.coockoo !== 'undefined') {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+                onSuccess : function () {
+                    report('success!')
+                },
+                onError : function () {
+                    report('error!')
+                },
+                onStep : function () {
+                    report('step');
+                },
+                counter : 10,
+                frequency : 25
+             });
+            
 
             setTimeout(function () {
                 window.coockoo = 'abracadabra';
             }, 140);
 
-            timer.start();
-            
             setTimeout(function () {
                 delete coockoo;
-                
-                timer.setCounter(10);
                 
                 setTimeout(function () {
                     window.coockoo = 'abracadabra'
                 }, 600);
-                
-                timer.start();
+
+                Timer({
+                    condition : function () {
+                        // check if variable are ready        
+                        if (typeof window.coockoo !== 'undefined') {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    },
+                    onSuccess : function () {
+                        report('success');
+                    },
+                    onError : function () {
+                        report('error');
+                    },
+                    onStep : function () {
+                        report('step');
+                    },
+                    counter : 10,
+                    frequency : 25
+                 });
             }, 500);
             
         </script>

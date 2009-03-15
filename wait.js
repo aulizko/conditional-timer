@@ -8,120 +8,107 @@
  * Usage:
  */
 (function () {
-    window.timer = function () {
-        var timer = null, 
-            counter = 200, 
-            frequency = 10, 
-            condition = function () { return false; },
-            onSuccessCallback = function () {}, 
-            onErrorCallback = function () {},
-            onStepCallback = function () {};
+    var DEFAULTS = {
+        COUNTER : 200,
+        FREQUENCY : 10,
+        CONDITION : function () { return false; },
+        CALLBACK : function () {}
+    };
 
-        return {
-            /**
-             * Set counter, or define, how many times should timer being invocated
-             * @method setCounter
-             * @param c {Number} new counter value
-             */
-            setCounter : function (c) {
-                counter = c;
-            },
-            /**
-             * Set frequency - how often (in millisecs) should timer being invocated
-             * @method setFrequency
-             * @param f {Number} frequency in milliseconds
-             */
-            setFrequency : function (f) {
-                frequency = f;
-            },
-            /**
-             * Set function which timer should call every iteration
-             * This function must return true or false. If this function return true, timer should stop.
-             * @method setCondition
-             * @param c {Function} function
-             */
-            setCondition : function (c) {
-                condition = c;
-            },
-            /** 
-             * Start timer
-             * @method start
-             */
-            start : function () {
+    var __timer = function (conf) {
+        this.timer = null;
+        this.counter = conf.counter || DEFAULTS.COUNTER;
+        this.frequency = conf.frequency || DEFAULTS.FREQUENCY;
+        this.condition = conf.condition || DEFAULTS.CONDITION;
+        this.onSuccessCallback = conf.onSuccess || DEFAULTS.CALLBACK;
+        this.onErrorCallback = conf.onError || DEFAULTS.CALLBACK;
+        this.onStepCallback = conf.onStep || DEFAULTS.CALLBACK;
+    };
+
+    var T = window.Timer = function (conf) {
+        this.timer = new __timer(conf);
+        this.timer.start();
+    };
+
+    __timer.prototype = {
+        /** 
+         * Start timer
+         * @method start
+         */
+        start : function () {
+            this.stop();
+            var self = this;
+            this.timer = setInterval(function () {
+                self.checkCounterLimit();
+            }, this.frequency);
+        },
+        /**
+         * Check condition or is counter positive.
+         * @method checkCounterLimit
+         * @private
+         */
+        checkCounterLimit : function () {
+            if (this.condition()) { // success
                 this.stop();
-                var self = this;
-                timer = setInterval(function () {
-                    self.checkCounterLimit();
-                }, frequency);
-            },
-            /**
-             * Check condition or is counter positive.
-             * @method checkCounterLimit
-             * @private
-             */
-            checkCounterLimit : function () {
-                if (condition()) { // success
+                this.onSuccessCallback();
+            } else {
+                if (this.counter == 0) { // error
                     this.stop();
-                    onSuccessCallback();
+                    this.onErrorCallback();
                 } else {
-                    if (counter == 0) { // error
-                        this.stop();
-                        onErrorCallback();
-                    } else {
-                        onStepCallback();
-                        counter --; // go on
-                    }
+                    this.onStepCallback();
+                    this.counter --; // go on
                 }
-            },
-            /**
-             * Manually stop timer
-             * @method stop
-             */
-            stop : function () {
-                clearInterval(timer);
-                timer = null;
-            },
-
-            /**
-             * Set callback which should being executed on success (if condition return true)
-             * @method onSucess
-             * @param fn {Function} function which should being executed
-             * @param data {Mixed} data which should be passed into callback funciton
-             * @param context {Object} context of the function
-             */
-            onSuccess : function (fn, data, context) {
-                context = (context) ? context : window;
-                onSuccessCallback = function () {
-                    fn.call(context, data);
-                };
-            },
-
-            /**
-             * Set callback which should being executed on error (if counter rich end and condition stll return false)
-             * @method onError
-             * @param fn {Funciton} function which shuld being executed
-             * @param data {Mixed} data which should being passed into callback function
-             * @param context {Object} context of the function
-             */
-            onError : function (fn, data, context) {
-                context = (context) ? context : window;
-                onErrorCallback = function () {
-                    fn.call(context, data);
-                };
-            },
-            /**
-             * Set callback which should being executed every iteration
-             * @method onStep
-             * @param fn {Funciton} function which shuld being executed
-             * @param data {Mixed} data which should being passed into callback function
-             * @param context {Object} context of the function
-             */
-            onStep : function (fn, data, context) {
-                context = (context) ? context : window;
-                onStepCallback = function () {
-                    fn.call(context, data);
-                };
             }
-        };    
-    }();
+        },
+        /**
+         * Manually stop timer
+         * @method stop
+         */
+        stop : function () {
+            clearInterval(this.timer);
+            this.timer = null;
+        },
+
+        /**
+         * Set callback which should being executed on success (if condition return true)
+         * @method onSucess
+         * @param fn {Function} function which should being executed
+         * @param data {Mixed} data which should be passed into callback funciton
+         * @param context {Object} context of the function
+         */
+        onSuccess : function (fn, data, context) {
+            context = (context) ? context : window;
+            this.onSuccessCallback = function () {
+                fn.call(context, data);
+            };
+        },
+
+        /**
+         * Set callback which should being executed on error (if counter rich end and condition stll return false)
+         * @method onError
+         * @param fn {Funciton} function which shuld being executed
+         * @param data {Mixed} data which should being passed into callback function
+         * @param context {Object} context of the function
+         */
+        onError : function (fn, data, context) {
+            context = (context) ? context : window;
+            this.onErrorCallback = function () {
+                fn.call(context, data);
+            };
+        },
+        /**
+         * Set callback which should being executed every iteration
+         * @method onStep
+         * @param fn {Funciton} function which shuld being executed
+         * @param data {Mixed} data which should being passed into callback function
+         * @param context {Object} context of the function
+         */
+        onStep : function (fn, data, context) {
+            context = (context) ? context : window;
+            this.onStepCallback = function () {
+                fn.call(context, data);
+            };
+        }
+    };    
 })();
